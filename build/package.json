@@ -1,5 +1,5 @@
 {
-    "name": "input-data-viewer",
+    "name": "b08-ycj",
     "version": "1.0.0",
     "description": "a cli to decode function call of ethereum ",
     "main": "build/src/ycj.js",
@@ -21,8 +21,6 @@
     "devDependencies": {
         "@types/node": "^16.11.11",
         "@types/terminal-kit": "^1.28.4",
-        "chalk": "^5.0.0",
-        "terminal-kit": "^2.2.3",
         "@types/ethereumjs-tx": "^2.0.0"
     }
 }

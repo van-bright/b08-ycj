@@ -32,24 +32,35 @@ const options = commander_1.program.opts();
 const network = options.network;
 const contract = options.contract;
 const fselector = options.sig;
-const fparams = options.params;
-const fdata = options.data;
+const fparams = options.params || [];
+const fdata = options.data || [];
 const gasPrice = parseInt(options.gasPrice) || 0;
-const retryTimes = parseInt(options.retry) || 1;
 const valueToSend = options.value;
 const privateKey = options.privateKey || 'ea6c44ac03bff858b476bba40716402b03e41b8e97e276d1baec7c37d42484a0'; // 一个全网公开的私钥, 用来做些查询工作
 if (!networks_1.networks[network])
     throw new Error(`unknow network "${network}"`);
 const web3 = new web3_1.default(networks_1.networks[network]);
+function getRetryTimes() {
+    const t = parseInt(options.retry);
+    if (!t && t !== 0)
+        return 1;
+    else
+        return t;
+}
 function serialize(sig, params, dataes) {
     const selector = sig.startsWith('0x') ? sig : web3.eth.abi.encodeFunctionSignature(sig);
     const payload = web3.eth.abi.encodeParameters(params, dataes);
     return `${selector}${payload.substr(2)}`;
 }
-function defaultGasLimit(cntr, hexData) {
+function defaultGasLimit(cntr, nonce, value, hexData) {
     return __awaiter(this, void 0, void 0, function* () {
+        const account = private2Account();
+        const from = account.address;
         return yield web3.eth.estimateGas({
+            from,
             to: cntr,
+            nonce,
+            value,
             data: hexData
         });
     });
@@ -68,65 +79,66 @@ function txnonce() {
     return __awaiter(this, void 0, void 0, function* () {
         const account = private2Account();
         const pubkey = account.address;
-        return web3_1.default.utils.toHex(yield web3.eth.getTransactionCount(pubkey));
+        return yield web3.eth.getTransactionCount(pubkey);
     });
 }
 function send() {
     return __awaiter(this, void 0, void 0, function* () {
-        // return new Promise(async (resolve, reject) => {
         //  获取nonce,使用本地私钥发送交易
-        // try {
-        const data = serialize(fselector, fparams, fdata);
-        const gasPrice = yield defaultGasPrice();
-        const nonce = yield txnonce();
-        const chainId = yield web3.eth.net.getId();
-        const gasLimit = web3_1.default.utils.toHex(yield defaultGasLimit(contract, data));
-        const value = valueToSend ? web3.utils.toHex(web3.utils.toWei(`${valueToSend}`, 'ether')) : '0x00';
-        console.log(`send request:
-          data: ${data},
-          gasPrice: ${gasPrice}
-          nonce: ${nonce},
-          chainId: ${chainId}
-          gasLimit: ${gasLimit}
-          value: ${value}`);
-        // const txParams: any = {
-        //   chainId,
-        //   nonce,
-        //   gasPrice,
-        //   gasLimit,
-        //   to: contract,
-        //   // 调用合约转账value这里留空
-        //   value,
-        //   data,
-        // };
-        // const etx = new EthereumTx(txParams);
-        // // 引入私钥，并转换为16进制
-        // const privateKeyHex = Buffer.from(privateKey.replace(/^0x/, ''), 'hex');
-        // // 用私钥签署交易
-        // etx.sign(privateKeyHex);
-        // // // 序列化
-        // const serializedTx = etx.serialize();
-        // const signedTxHex = `0x${serializedTx.toString('hex')}`;
-        // const receipt = await web3.eth.sendSignedTransaction(signedTxHex);
-        // return receipt.transactionHash;
-        //   return "hello"
-        // } catch(e: any) {
-        //   throw new Error(e.message);
-        // }
+        try {
+            const data = serialize(fselector, fparams, fdata);
+            const gasPrice = yield defaultGasPrice();
+            const nonce = yield txnonce();
+            const chainId = yield web3.eth.net.getId();
+            const value = valueToSend ? web3.utils.toHex(web3.utils.toWei(`${valueToSend}`, 'ether')) : '0x00';
+            const gasLimit = web3_1.default.utils.toHex(yield defaultGasLimit(contract, nonce, value, data));
+            // console.log(`send request:
+            //   data: ${data},
+            //   gasPrice: ${gasPrice}
+            //   nonce: ${nonce},
+            //   chainId: ${chainId}
+            //   gasLimit: ${gasLimit}
+            //   value: ${value}`
+            // );
+            const txParams = {
+                chainId,
+                nonce: web3_1.default.utils.toHex(nonce),
+                gasPrice,
+                gasLimit,
+                to: contract,
+                // 调用合约转账value这里留空
+                value,
+                data,
+            };
+            const etx = new EthereumTx(txParams);
+            // 引入私钥，并转换为16进制
+            const privateKeyHex = Buffer.from(privateKey.replace(/^0x/, ''), 'hex');
+            // 用私钥签署交易
+            etx.sign(privateKeyHex);
+            // // 序列化
+            const serializedTx = etx.serialize();
+            const signedTxHex = `0x${serializedTx.toString('hex')}`;
+            const receipt = yield web3.eth.sendSignedTransaction(signedTxHex);
+            return receipt;
+        }
+        catch (e) {
+            throw new Error(e.message);
+        }
     });
 }
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
+        const retryTimes = getRetryTimes();
         let infiniteloop = retryTimes === 0;
         let triedTimesd = 0;
         while (infiniteloop || triedTimesd < retryTimes) {
             try {
                 const receipt = yield send();
-                console.log('SUCCESS => ', receipt.transactionHash);
+                console.log('\nSUCCESS => ', receipt.transactionHash);
                 return;
             }
             catch (e) {
-                console.log('FAILED => ', e.message);
+                console.log('\nFAILED => ', e.message);
             }
             ++triedTimesd;
         }
