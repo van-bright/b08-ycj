@@ -4,7 +4,7 @@
   "description": "a cli to decode function call of ethereum ",
   "main": "build/src/ycj.js",
   "bin": {
-    "input-viewer": "build/src/ycj.js"
+    "ycj": "build/src/ycj.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
