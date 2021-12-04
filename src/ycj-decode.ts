@@ -4,7 +4,7 @@ import {program} from "commander";
 import Web3 from "web3";
 
 program
-  .requiredOption('--sigs <sigs...>', 'to use latest version')
+  .requiredOption('--sig <sig...>', 'to use latest version')
   .requiredOption('--data <data>', 'input data to decode');
 
 program.parse(process.argv);
@@ -29,6 +29,7 @@ function main(sig: string[], data: string) {
   const abi = generate_abi_object(sig);
   const funcSig = data.substr(0, 10);
   const pureData = `0x${data.substr(10)}`;
+
   const params = web3.eth.abi.decodeParameters(abi, pureData);
   print(funcSig, params);
 }

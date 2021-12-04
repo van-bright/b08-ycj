@@ -7,7 +7,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const commander_1 = require("commander");
 const web3_1 = __importDefault(require("web3"));
 commander_1.program
-    .requiredOption('--sigs <sigs...>', 'to use latest version')
+    .requiredOption('--sig <sig...>', 'to use latest version')
     .requiredOption('--data <data>', 'input data to decode');
 commander_1.program.parse(process.argv);
 const options = commander_1.program.opts();
