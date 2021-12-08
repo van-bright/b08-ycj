@@ -17,8 +17,9 @@ const commander_1 = require("commander");
 const web3_1 = __importDefault(require("web3"));
 const cross_fetch_1 = __importDefault(require("cross-fetch"));
 commander_1.program
-    .requiredOption('--sig <sig...>', 'to use latest version')
-    .requiredOption('--data <data>', 'input data to decode');
+    .requiredOption('--data <data>', 'input data to decode')
+    .option('--sig <sig...>', 'to use latest version')
+    .option('-s, --simple', 'input data with out function signature');
 commander_1.program.parse(process.argv);
 const options = commander_1.program.opts();
 const web3 = new web3_1.default("https://127.0.0.1");
@@ -44,15 +45,33 @@ function print(funcSig, params) {
 function generate_abi_object(types) {
     return types;
 }
-function main(sig, data) {
+function main(sig, data, isSimple) {
     return __awaiter(this, void 0, void 0, function* () {
-        const abi = generate_abi_object(sig);
-        let funcSig = data.substr(0, 10);
-        const pureData = `0x${data.substr(10)}`;
-        const params = web3.eth.abi.decodeParameters(abi, pureData);
-        funcSig = yield try_parse_signature(funcSig);
-        print(funcSig, params);
+        let abi = [];
+        if (isSimple) {
+            abi = generate_abi_object(sig);
+            const params = web3.eth.abi.decodeParameters(abi, data);
+            print("", params);
+        }
+        else {
+            let funcSig = data.substr(0, 10);
+            const decodeFuncSig = yield try_parse_signature(funcSig);
+            // let abi;
+            // if (funcSig !== decodeFuncSig) {
+            //   let r = /\((.+)\)/g
+            //   let a = decodeFuncSig.match(r);
+            //   let sa = RegExp.$1;
+            //   abi = sa.split(',')
+            // } else {
+            // abi = generate_abi_object(sig);
+            // }
+            if (sig)
+                abi = generate_abi_object(sig);
+            const pureData = `0x${data.substr(10)}`;
+            const params = web3.eth.abi.decodeParameters(abi, pureData);
+            print(decodeFuncSig, params);
+        }
     });
 }
-main(options.sig, options.data).catch(e => console.log(e));
+main(options.sig, options.data, options.simple).catch(e => console.log(e));
 //# sourceMappingURL=ycj-decode.js.map

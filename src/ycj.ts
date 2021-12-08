@@ -11,6 +11,7 @@ program.addHelpText('after',
     $ ycj decode
     $ ycj encode
     $ ycj call
+    $ ycj get
 `);
 
 program.showHelpAfterError();
@@ -18,6 +19,7 @@ program.showHelpAfterError();
 program.command('decode', 'to decode input data of a function call');
 program.command('encode', 'to encode data with specific types');
 program.command('call', 'to encode data with specific types');
+program.command('get', 'to read contract info by eth_call');
 
 program.parse(process.argv);
 

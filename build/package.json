@@ -1,6 +1,6 @@
 {
     "name": "b08-ycj",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "a cli to decode function call of ethereum ",
     "main": "build/src/ycj.js",
     "bin": {

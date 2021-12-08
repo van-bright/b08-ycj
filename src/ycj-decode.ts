@@ -5,8 +5,9 @@ import Web3 from "web3";
 import fetch from 'cross-fetch';
 
 program
-  .requiredOption('--sig <sig...>', 'to use latest version')
-  .requiredOption('--data <data>', 'input data to decode');
+.requiredOption('--data <data>', 'input data to decode')
+.option('--sig <sig...>', 'to use latest version')
+.option('-s, --simple', 'input data with out function signature')
 
 program.parse(process.argv);
 
@@ -52,14 +53,33 @@ function generate_abi_object(types: string[]): any[] {
   return types;
 }
 
-async function main(sig: string[], data: string) {
-  const abi = generate_abi_object(sig);
-  let funcSig = data.substr(0, 10);
-  const pureData = `0x${data.substr(10)}`;
+async function main(sig: string[], data: string, isSimple: boolean) {
+  let abi: any[] = [];
+  if (isSimple) {
+    abi = generate_abi_object(sig);
+    const params = web3.eth.abi.decodeParameters(abi, data);
+    print("", params);
+  } else {
+    let funcSig = data.substr(0, 10);
+    const decodeFuncSig = await try_parse_signature(funcSig);
+    // let abi;
+    // if (funcSig !== decodeFuncSig) {
+    //   let r = /\((.+)\)/g
+    //   let a = decodeFuncSig.match(r);
+    //   let sa = RegExp.$1;
+    //   abi = sa.split(',')
+    // } else {
+    // abi = generate_abi_object(sig);
+    // }
 
-  const params = web3.eth.abi.decodeParameters(abi, pureData);
-  funcSig = await try_parse_signature(funcSig);
-  print(funcSig, params);
+    if (sig) abi = generate_abi_object(sig)
+
+    const pureData = `0x${data.substr(10)}`;
+    const params = web3.eth.abi.decodeParameters(abi, pureData);
+
+    print(decodeFuncSig, params);
+
+  }
 }
 
-main(options.sig, options.data).catch(e => console.log(e));
+main(options.sig, options.data, options.simple).catch(e => console.log(e));
