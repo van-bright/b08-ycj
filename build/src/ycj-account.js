@@ -23,10 +23,12 @@ const count = parseInt(options.count) || 1;
 const web3 = new web3_1.default("http://127.0.0.1");
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
+        let accounts = {};
         for (let i = 0; i < count; i++) {
             const acc = web3.eth.accounts.create();
-            console.log(`"${acc.address}": "${acc.privateKey}"`);
+            accounts[acc.address] = acc.privateKey;
         }
+        console.log(`${JSON.stringify(accounts, null, 2)}`);
     });
 }
 main().catch(e => console.log(e.message));
