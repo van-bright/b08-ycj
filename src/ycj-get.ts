@@ -6,8 +6,6 @@ import fetch from 'cross-fetch';
 
 import {networks} from "./networks";
 
-const EthereumTx = require('ethereumjs-tx');
-
 program
   .requiredOption('--network <network>', '区块链网络的RPC')
   .requiredOption('--contract <contract>', '调用的合约地址')

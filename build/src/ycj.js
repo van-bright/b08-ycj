@@ -13,6 +13,7 @@ commander_1.program.addHelpText('after', `
     $ ycj encode
     $ ycj call
     $ ycj get
+    $ ycj account
 `);
 commander_1.program.showHelpAfterError();
 // 配置command
@@ -20,6 +21,7 @@ commander_1.program.command('decode', 'to decode input data of a function call')
 commander_1.program.command('encode', 'to encode data with specific types');
 commander_1.program.command('call', 'to encode data with specific types');
 commander_1.program.command('get', 'to read contract info by eth_call');
+commander_1.program.command('account', 'to create some account');
 commander_1.program.parse(process.argv);
 if (commander_1.program.args.length === 0) {
     commander_1.program.help();

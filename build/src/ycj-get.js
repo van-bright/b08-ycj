@@ -17,7 +17,6 @@ const commander_1 = require("commander");
 const web3_1 = __importDefault(require("web3"));
 const cross_fetch_1 = __importDefault(require("cross-fetch"));
 const networks_1 = require("./networks");
-const EthereumTx = require('ethereumjs-tx');
 commander_1.program
     .requiredOption('--network <network>', '区块链网络的RPC')
     .requiredOption('--contract <contract>', '调用的合约地址')

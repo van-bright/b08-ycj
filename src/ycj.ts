@@ -12,6 +12,7 @@ program.addHelpText('after',
     $ ycj encode
     $ ycj call
     $ ycj get
+    $ ycj account
 `);
 
 program.showHelpAfterError();
@@ -20,6 +21,7 @@ program.command('decode', 'to decode input data of a function call');
 program.command('encode', 'to encode data with specific types');
 program.command('call', 'to encode data with specific types');
 program.command('get', 'to read contract info by eth_call');
+program.command('account', 'to create some account');
 
 program.parse(process.argv);
 
