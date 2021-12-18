@@ -17,11 +17,12 @@ commander_1.program.addHelpText('after', `
 `);
 commander_1.program.showHelpAfterError();
 // 配置command
-commander_1.program.command('decode', 'to decode input data of a function call');
-commander_1.program.command('encode', 'to encode data with specific types');
-commander_1.program.command('call', 'to encode data with specific types');
-commander_1.program.command('get', 'to read contract info by eth_call');
-commander_1.program.command('account', 'to create some account');
+commander_1.program.command('decode', '解码十六进制编码的数据');
+commander_1.program.command('encode', '将数据编码为十六进制数据');
+commander_1.program.command('call', '调用合约的非view方法');
+commander_1.program.command('get', '通过eth_call方法调用合约的view方法');
+commander_1.program.command('account', '创建账号');
+commander_1.program.command('transfer', '批量转账');
 commander_1.program.parse(process.argv);
 if (commander_1.program.args.length === 0) {
     commander_1.program.help();
