@@ -35,16 +35,17 @@ function parseOptions(options: any) {
 
   const privateKey = options.privateKey;
 
-  let transInfo: TransferInfo = {
-    network,
-    privateKey,
-    to: [],
-    amount: [],
-  }
 
   if (!networks[network]) {
     console.log(`unsupport network ${network}`);
     process.exit(1);
+  }
+
+  let transInfo: TransferInfo = {
+    network: networks[network],
+    privateKey,
+    to: [],
+    amount: [],
   }
 
   if (jsonFile) {
@@ -128,7 +129,7 @@ async function send(transInfo: TransferInfo): Promise<any> {
 
 
 async function transferLocalValue(options: any) {
-  console.log('call local: ', options)
+  // console.log('call local: ', options)
   try {
     let opt = parseOptions(options);
     await send(opt);

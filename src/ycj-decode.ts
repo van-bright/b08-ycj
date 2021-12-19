@@ -8,6 +8,7 @@ program
 .requiredOption('--data <data>', 'input data to decode')
 .option('--sig <sig...>', 'to use latest version')
 .option('-s, --simple', 'input data with out function signature')
+.option('-a, --ascii', 'decode hex string to ascii string')
 
 program.parse(process.argv);
 
@@ -54,6 +55,12 @@ function generate_abi_object(types: string[]): any[] {
 }
 
 async function main(sig: string[], data: string, isSimple: boolean) {
+  if (options.ascii) {
+    const out = web3.utils.hexToAscii(data);
+    console.log(out);
+    return;
+  }
+
   let abi: any[] = [];
   if (isSimple) {
     abi = generate_abi_object(sig);

@@ -32,16 +32,16 @@ function parseOptions(options) {
     const amounts = options.amount;
     const jsonFile = options.json;
     const privateKey = options.privateKey;
-    let transInfo = {
-        network,
-        privateKey,
-        to: [],
-        amount: [],
-    };
     if (!networks_1.networks[network]) {
         console.log(`unsupport network ${network}`);
         process.exit(1);
     }
+    let transInfo = {
+        network: networks_1.networks[network],
+        privateKey,
+        to: [],
+        amount: [],
+    };
     if (jsonFile) {
         let recepientInfo = require(jsonFile);
         let recepients = Object.keys(recepientInfo);
@@ -123,7 +123,7 @@ function send(transInfo) {
 }
 function transferLocalValue(options) {
     return __awaiter(this, void 0, void 0, function* () {
-        console.log('call local: ', options);
+        // console.log('call local: ', options)
         try {
             let opt = parseOptions(options);
             yield send(opt);

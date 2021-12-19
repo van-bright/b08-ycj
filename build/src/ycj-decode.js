@@ -19,7 +19,8 @@ const cross_fetch_1 = __importDefault(require("cross-fetch"));
 commander_1.program
     .requiredOption('--data <data>', 'input data to decode')
     .option('--sig <sig...>', 'to use latest version')
-    .option('-s, --simple', 'input data with out function signature');
+    .option('-s, --simple', 'input data with out function signature')
+    .option('-a, --ascii', 'decode hex string to ascii string');
 commander_1.program.parse(process.argv);
 const options = commander_1.program.opts();
 const web3 = new web3_1.default("https://127.0.0.1");
@@ -47,6 +48,11 @@ function generate_abi_object(types) {
 }
 function main(sig, data, isSimple) {
     return __awaiter(this, void 0, void 0, function* () {
+        if (options.ascii) {
+            const out = web3.utils.hexToAscii(data);
+            console.log(out);
+            return;
+        }
         let abi = [];
         if (isSimple) {
             abi = generate_abi_object(sig);
