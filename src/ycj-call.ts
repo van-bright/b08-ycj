@@ -8,15 +8,15 @@ import {networks} from "./networks";
 const EthereumTx = require('ethereumjs-tx');
 
 program
-  .requiredOption('--network <network>', '区块链网络的RPC')
-  .requiredOption('--contract <contract>', '调用的合约地址')
+  .requiredOption('--network <network>', '区块链网络的名称, 如"bsc", "matic"')
+  .requiredOption('--contract <contract>', '被调用的合约地址')
   .requiredOption('--sig <sig>', '合约方法签名, 如果知道abi, 填func(uint)格式, 否则填0x12345678格式的方法签名')
-  .option('--params <params...>', '合约方法的参数类型列表. 在--sig是0x12345678格式时需要和--data一起提供')
-  .option('--data <data...>', '合约方法的参数')
+  .option('--params <params...>', '合约方法的参数类型列表, 如 --params uint256 uint256 address供')
+  .option('--data <data...>', '合约方法的实际参数值, 和--params中提供的参数一一对应')
   .option('--gas-price <gasPrice>', '调用合约使用的gas price, 单位为gwei. 默认使用推荐的gas费')
-  .option('--retry <retry>', '重试直到成功的次数, 默认为1, 即不重试, 发出交易就可以. 0 表示无限次重试, 直到返回成功.')
+  .option('--retry <retry>', '重试次数, 默认为1, 即不重试, 发出交易就可以. 0 表示无限次重试, 直到返回成功.')
   .option('--private-key <privateKey>', '签名的私钥')
-  .option('--value <value>', '调用时发送的value, 单位为eth. 默认值为0')
+  .option('--value <value>', '调用时发送的value, 单位为ethers. 默认值为0')
 
 program.parse(process.argv);
 

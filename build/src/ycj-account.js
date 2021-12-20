@@ -16,9 +16,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const commander_1 = require("commander");
 const web3_1 = __importDefault(require("web3"));
 commander_1.program
-    .option('-c, --count <count>', '生成账号数量', '1')
-    .option('-y, --yaml', "生成yaml配置信息", false)
-    .option('-t, --transfer', "生成transfer命令需要的json文件", false);
+    .option('-c, --count <count>', '生成账号数量, 默认数量为1.  生成结果一个数组: [{"address": "0xabc", "privateKey": "0xabcdef"}, ....]', '1')
+    .option('-y, --yaml', '使用私钥, 生成yaml格式的列表,形如 - "0xabcedf"', false)
+    .option('-t, --transfer', '生成ycj transfer命令需要的json格式信息: {"0xabc": "1.0", "0xabcef": "1.0", ....} ', false);
 commander_1.program.parse(process.argv);
 const options = commander_1.program.opts();
 const count = parseInt(options.count) || 1;

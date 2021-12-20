@@ -7,11 +7,11 @@ import fetch from 'cross-fetch';
 import {networks} from "./networks";
 
 program
-  .requiredOption('--network <network>', '区块链网络的RPC')
-  .requiredOption('--contract <contract>', '调用的合约地址')
+  .requiredOption('--network <network>', '区块链网络的名称, 如"bsc", "matic"')
+  .requiredOption('--contract <contract>', '被调用的合约地址')
   .requiredOption('--sig <sig>', '合约方法签名, 如果知道abi, 填func(uint)格式, 否则填0x12345678格式的方法签名')
-  .option('--params <params...>', '合约方法的参数类型列表. 在--sig是0x12345678格式时需要和--data一起提供')
-  .option('--data <data...>', '合约方法的参数')
+  .option('--params <params...>', '合约方法的参数类型列表, 如 --params uint256 uint256 address')
+  .option('--data <data...>', '合约方法的实际参数值, 和--params中提供的参数一一对应')
 
 program.parse(process.argv);
 

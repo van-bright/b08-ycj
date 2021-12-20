@@ -5,10 +5,10 @@ import Web3 from "web3";
 import fetch from 'cross-fetch';
 
 program
-.requiredOption('--data <data>', 'input data to decode')
-.option('--sig <sig...>', 'to use latest version')
-.option('-s, --simple', 'input data with out function signature')
-.option('-a, --ascii', 'decode hex string to ascii string')
+.requiredOption('--data <data>', '需要被解码的hex编码数据字符串')
+.option('--sig <sig...>', '需要解码的参数类型列表, 如uint256, address等')
+.option('-s, --simple', '简单模式, 即--data中提供的数据, 没有function selector.')
+.option('-a, --ascii', '将--data中提供的数据, 按bytes编码的方式, 解析成ascii字符')
 
 program.parse(process.argv);
 

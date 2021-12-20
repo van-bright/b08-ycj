@@ -17,12 +17,12 @@ const commander_1 = require("commander");
 const networks_1 = require("./networks");
 const web3_1 = __importDefault(require("web3"));
 var EthereumTx = require('ethereumjs-tx');
-commander_1.program.command('local').description("转账链的原生代币")
-    .requiredOption('--network <network>', '区块链网络的RPC')
+commander_1.program.command('native').description("从签名私钥的账号中, 转账链的原生代币")
+    .requiredOption('--network <network>', '区块链网络的名称, 如"bsc", "matic"')
     .requiredOption('--private-key <privateKey>', '签名的私钥')
-    .option('--to <to...>', '接收账号列表')
-    .option('--amount <amount...>', '对应每个接收账号的接收的代币数量, 单位为 ether')
-    .option('--json <json>', '使用json文件列举转账信息, 如{"0x123456": "10000000", ...}')
+    .option('--to <to...>', '接收账号列表, 如 --to 0xabc1 0xabc2')
+    .option('--amount <amount...>', '对应每个接收账号的接收的代币数量, 单位为 ether. 如 --amount "1.0" "0.8"')
+    .option('--json <json>', '使用json文件列举转账信息, 如{"0xabc1": "1.0", "0xabc2": "0.8", ...}')
     .action(transferLocalValue);
 commander_1.program.parse(process.argv);
 function parseOptions(options) {

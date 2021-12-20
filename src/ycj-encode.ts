@@ -4,10 +4,10 @@ import {program} from "commander";
 import Web3 from "web3";
 
 program
-  .option('--sig <sigs...>', 'type to encode')
-  .option('--data <data...>', 'data to encode')
-  .option('-f, --func', "encode function signature")
-  .option('-e, --event', "encode event signature");
+  .option('--sig <sig...>', '需要编码的类型, 如 --sig uint256 address')
+  .option('--data <data...>', '实际编码的数据, 如 --data 1 0xabcedfg')
+  .option('-f, --func', "获得--data提供的方法字面量的selector, 如 --data 'myfun(uint256)' -f")
+  .option('-e, --event', "获得--data提供的Event字面量的签名, 如 --data 'myevent(uint256,address) -e");
 
 
 program.parse(process.argv);
@@ -24,7 +24,7 @@ function main() {
     const esig = web3.eth.abi.encodeEventSignature(options.data[0]);
     console.log(esig);
   } else {
-    const params = web3.eth.abi.encodeParameters(options.sigs, options.data);
+    const params = web3.eth.abi.encodeParameters(options.sig, options.data);
     // console.log(`${sigs} ${data} => ${params.startsWith('0x') ? params.length - 2 : params.length}`);
     console.log(`\t${params}`);
   }
