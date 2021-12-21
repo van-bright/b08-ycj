@@ -8,7 +8,7 @@ import delay from "delay";
 var EthereumTx = require('ethereumjs-tx');
 
 async function defaultGasLimit() {
-  return '3000000';
+  return '21000';
 }
 
 function private2Account(web3: Web3, privateKey: string) {
@@ -28,6 +28,7 @@ async function main()  {
   const pk = '0xced24e91fa4531456b60f9fc01b8041aef9c537cb7f813a0b9ef2f5e81e03fef';
   try {
     const web3 = new Web3(new Web3.providers.HttpProvider(networks['bsc']));
+    const toBN = web3.utils.toBN;
     const pubkey = private2Account(web3, pk)
     const gasPrice = await defaultGasPrice(web3);
     const chainId = await web3.eth.net.getId();
@@ -38,9 +39,15 @@ async function main()  {
     console.log('balance: ', balance.toString());
 
     if (balance.toString() !== '0') {
-      const a = parseInt(balance) - 21000000000000;
+      const bgbalance = toBN(balance);
+      const limit = toBN(await defaultGasLimit());
+      const subv = limit.mul(toBN(gasPrice));
+      // console.log('subv: ', subv.toString(10))
+      let v = bgbalance.sub(subv)
+      // console.log('left v: ', v.toString(10))
+
       const nonce = await txnonce(web3, pubkey);
-      const value = web3.utils.toHex(web3.utils.toWei(`${a}`, 'wei'));
+      const value = web3.utils.toHex(web3.utils.toWei(`${v}`, 'wei'));
 
       const txParams: any = {
         from: pubkey,
