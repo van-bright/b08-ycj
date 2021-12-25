@@ -22,8 +22,8 @@ program.command('encode', '用于将数据编码为十六进制格式');
 program.command('call', '用于调用合约的非view方法');
 program.command('get', '用于通过eth_call方法, 调用合约的view方法');
 program.command('account', '用于批量创建账号');
-program.command('transfer', '用于批量转账');
-program.command('monit', '用于批量转账');
+program.command('transfer', '用于批量转账链的本币, 如ETH, BNB等');
+program.command('sign', '用于给交易签名');
 
 
 program.parse(process.argv);

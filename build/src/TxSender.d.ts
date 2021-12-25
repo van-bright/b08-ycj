@@ -19,11 +19,12 @@ export default class TxSender {
     constructor(rpc: string, pk?: string);
     private serialize;
     private defaultGasLimit;
-    private getPubkey;
     private defaultGasPrice;
     private txnonce;
+    getPubkey(): string;
     sign(tx: TxOption): Promise<string>;
     send(signedTxHex: string): Promise<any>;
+    getBalance(account: string): Promise<string>;
     query(tx: TxOption): Promise<any>;
 }
 export {};

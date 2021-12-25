@@ -13,13 +13,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const web3_1 = __importDefault(require("web3"));
+const networks_1 = require("./networks");
+const cross_fetch_1 = __importDefault(require("cross-fetch"));
 const EthereumTx = require('ethereumjs-tx');
 const BN = web3_1.default.utils.toBN;
 class TxSender {
     constructor(rpc, pk = 'ea6c44ac03bff858b476bba40716402b03e41b8e97e276d1baec7c37d42484a0') {
-        this.rpc = rpc;
+        this.rpc = networks_1.networks[rpc] || rpc;
         this.privateKey = pk;
-        this.web3 = new web3_1.default(rpc);
+        this.web3 = new web3_1.default(this.rpc);
     }
     serialize(mo) {
         let func;
@@ -48,9 +50,6 @@ class TxSender {
             });
         });
     }
-    getPubkey() {
-        return this.web3.eth.accounts.privateKeyToAccount(this.privateKey).address;
-    }
     defaultGasPrice(gasPrice) {
         return __awaiter(this, void 0, void 0, function* () {
             if (gasPrice) {
@@ -69,11 +68,14 @@ class TxSender {
             return yield this.web3.eth.getTransactionCount(pubkey);
         });
     }
+    getPubkey() {
+        return this.web3.eth.accounts.privateKeyToAccount(this.privateKey).address;
+    }
     sign(tx) {
         return __awaiter(this, void 0, void 0, function* () {
             //  获取nonce,使用本地私钥发送交易
             try {
-                const data = this.serialize(tx.data);
+                const data = tx.data ? this.serialize(tx.data) : undefined;
                 const gasPrice = yield this.defaultGasPrice(tx.gasPrice);
                 const nonce = yield this.txnonce();
                 const chainId = yield this.web3.eth.net.getId();
@@ -115,6 +117,11 @@ class TxSender {
             }
         });
     }
+    getBalance(account) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.web3.eth.getBalance(account);
+        });
+    }
     query(tx) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -131,7 +138,7 @@ class TxSender {
                     "id": 666,
                     "jsonrpc": "2.0"
                 };
-                const rsp = yield fetch(this.rpc, {
+                const rsp = yield (0, cross_fetch_1.default)(this.rpc, {
                     body: JSON.stringify(req),
                     headers: { "Content-Type": "application/json" },
                     method: "POST"
@@ -148,4 +155,4 @@ class TxSender {
     }
 }
 exports.default = TxSender;
-//# sourceMappingURL=tx-sender.js.map
+//# sourceMappingURL=TxSender.js.map

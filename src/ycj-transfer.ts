@@ -2,18 +2,15 @@
 
 import { program } from "commander";
 
-import { networks } from "./networks";
-import Web3 from "web3";
-var EthereumTx = require('ethereumjs-tx');
+import TxSender, { TxOption } from "./TxSender";
 
-program.command('native').description("从签名私钥的账号中, 转账链的原生代币")
-  .requiredOption('--network <network>', '区块链网络的名称, 如"bsc", "matic"')
+program.description("从签名私钥的账号中, 转账链的原生代币")
+  .requiredOption('--network <network>', '区块链网络的名称, 如"bsc", "matic", 或者rpc地址, 如 http://example.com')
   .requiredOption('--private-key <privateKey>', '签名的私钥')
   .option('--to <to...>', '接收账号列表, 如 --to 0xabc1 0xabc2')
   .option('--amount <amount...>', '对应每个接收账号的接收的代币数量, 单位为 ether. 如 --amount "1.0" "0.8"')
   .option('--json <json>', '使用json文件列举转账信息, 如{"0xabc1": "1.0", "0xabc2": "0.8", ...}')
-  .action(transferLocalValue);
-
+  .option('--gas-price <gasprice>', '设置gasPrice, 单位为 gwei')
 
 program.parse(process.argv);
 
@@ -22,29 +19,24 @@ interface TransferInfo {
   to: string[];
   amount: string[];
   privateKey: string;
+  gasPrice?: string;
 }
 
 
 function parseOptions(options: any) {
   const network = options.network;
-  const contract = options.contract;
   const recepients = options.to;
   const amounts = options.amount;
   const jsonFile = options.json;
 
   const privateKey = options.privateKey;
 
-
-  if (!networks[network]) {
-    console.log(`unsupport network ${network}`);
-    process.exit(1);
-  }
-
   let transInfo: TransferInfo = {
-    network: networks[network],
+    network,
     privateKey,
     to: [],
     amount: [],
+    gasPrice: options.gasprice
   }
 
   if (jsonFile) {
@@ -70,55 +62,18 @@ function parseOptions(options: any) {
   return transInfo;
 }
 
-async function defaultGasLimit() {
-  return '3000000';
-}
-
-function private2Account(web3: Web3, privateKey: string) {
-  return web3.eth.accounts.privateKeyToAccount(privateKey).address;
-}
-
-async function defaultGasPrice(web3: Web3) {
-  return Web3.utils.toHex(await web3.eth.getGasPrice());
-}
-
-async function txnonce(web3: Web3, pubkey: string) {
-  return await web3.eth.getTransactionCount(pubkey);
-}
-
 async function send(transInfo: TransferInfo): Promise<any> {
-  //  获取nonce,使用本地私钥发送交易
   try {
-    const web3 = new Web3(new Web3.providers.HttpProvider(transInfo.network));
-    const pubkey = private2Account(web3, transInfo.privateKey)
-    const gasPrice = await defaultGasPrice(web3);
-    const chainId = await web3.eth.net.getId();
-    const gasLimit = Web3.utils.toHex(await defaultGasLimit());
-
+    const txSender = new TxSender(transInfo.network, transInfo.privateKey);
     for (let i = 0; i < transInfo.to.length; i++) {
-      const nonce = await txnonce(web3, pubkey);
-      const value = web3.utils.toHex(web3.utils.toWei(`${transInfo.amount[i]}`, 'ether'));
-
-      const txParams: any = {
-        from: pubkey,
+      const tx: TxOption = {
+        from: txSender.getPubkey(),
         to: transInfo.to[i],
-        chainId,
-        nonce: Web3.utils.toHex(nonce),
-        gasPrice,
-        gasLimit,
-        // 调用合约转账value这里留空
-        value,
+        value: transInfo.amount[i],
+        gasLimit: '21000',
       };
-      const etx = new EthereumTx(txParams);
-      // 引入私钥，并转换为16进制
-      const privateKeyHex = Buffer.from(transInfo.privateKey.replace(/^0x/, ''), 'hex');
-      // 用私钥签署交易
-      etx.sign(privateKeyHex);
-      // // 序列化
-      const serializedTx = etx.serialize();
-      const signedTxHex = `0x${serializedTx.toString('hex')}`;
-
-      const receipt = await web3.eth.sendSignedTransaction(signedTxHex);
+      const signedTxHex = await txSender.sign(tx);
+      const receipt = await txSender.send(signedTxHex);
       console.log(`SUCCESS => ${transInfo.to[i]} : ${transInfo.amount[i]}  ${receipt.transactionHash}}`);
     }
   } catch (e: any) {
@@ -127,13 +82,13 @@ async function send(transInfo: TransferInfo): Promise<any> {
 }
 
 
-async function transferLocalValue(options: any) {
-  // console.log('call local: ', options)
+async function main() {
   try {
-    let opt = parseOptions(options);
+    let opt = parseOptions(program.opts());
     await send(opt);
   } catch (e: any) {
     console.log('错误: ' + e.message);
   }
-
 }
+
+main();
