@@ -21,9 +21,11 @@ commander_1.program.description("从签名私钥的账号中, 转账链的原生
     .option('--to <to...>', '接收账号列表, 如 --to 0xabc1 0xabc2')
     .option('--amount <amount...>', '对应每个接收账号的接收的代币数量, 单位为 ether. 如 --amount "1.0" "0.8"')
     .option('--json <json>', '使用json文件列举转账信息, 如{"0xabc1": "1.0", "0xabc2": "0.8", ...}')
-    .option('--gas-price <gasprice>', '设置gasPrice, 单位为 gwei');
+    .option('--gas-price <gasprice>', '设置gasPrice, 单位为 gwei')
+    .option('-s,--sign', "仅输出签名后交易, 但是不发送");
 commander_1.program.parse(process.argv);
-function parseOptions(options) {
+const options = commander_1.program.opts();
+function parseOptions() {
     const network = options.network;
     const recepients = options.to;
     const amounts = options.amount;
@@ -68,10 +70,16 @@ function send(transInfo) {
                     to: transInfo.to[i],
                     value: transInfo.amount[i],
                     gasLimit: '21000',
+                    gasPrice: transInfo.gasPrice
                 };
                 const signedTxHex = yield txSender.sign(tx);
-                const receipt = yield txSender.send(signedTxHex);
-                console.log(`SUCCESS => ${transInfo.to[i]} : ${transInfo.amount[i]}  ${receipt.transactionHash}}`);
+                if (options.sign) {
+                    console.log(`\n${signedTxHex}`);
+                }
+                else {
+                    const receipt = yield txSender.send(signedTxHex);
+                    console.log(`SUCCESS => ${transInfo.to[i]} : ${transInfo.amount[i]}  ${receipt.transactionHash}}`);
+                }
             }
         }
         catch (e) {
@@ -82,7 +90,7 @@ function send(transInfo) {
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            let opt = parseOptions(commander_1.program.opts());
+            let opt = parseOptions();
             yield send(opt);
         }
         catch (e) {

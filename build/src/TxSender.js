@@ -79,9 +79,19 @@ class TxSender {
                 const gasPrice = yield this.defaultGasPrice(tx.gasPrice);
                 const nonce = yield this.txnonce();
                 const chainId = yield this.web3.eth.net.getId();
-                const value = tx.value ? this.web3.utils.toHex(this.web3.utils.toWei(`${tx.value}`, 'ether')) : '0x00';
+                let value = '0x00';
+                if (tx.value) {
+                    if (tx.value.startsWith('0x') || tx.value.startsWith('0X'))
+                        value = web3_1.default.utils.toHex(tx.value.substring(2));
+                    else
+                        value = web3_1.default.utils.toHex(web3_1.default.utils.toWei(`${tx.value}`, 'ether'));
+                }
                 const gasLimit = web3_1.default.utils.toHex(tx.gasLimit ? tx.gasLimit : yield this.defaultGasLimit(tx.to, nonce, value, data));
+                console.log('value: ', value);
+                console.log('gasprice: ', gasPrice);
+                console.log('gaslimit: ', gasLimit);
                 const txParams = {
+                    from: tx.from,
                     to: tx.to,
                     chainId,
                     nonce: web3_1.default.utils.toHex(nonce),
@@ -89,7 +99,7 @@ class TxSender {
                     gasLimit,
                     // 调用合约转账value这里留空
                     value,
-                    data,
+                    // data,
                 };
                 const etx = new EthereumTx(txParams);
                 // 引入私钥，并转换为16进制

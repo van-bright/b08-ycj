@@ -90,10 +90,16 @@ export default class TxSender {
       const gasPrice = await this.defaultGasPrice(tx.gasPrice);
       const nonce = await this.txnonce();
       const chainId = await this.web3.eth.net.getId();
-      const value = tx.value ? this.web3.utils.toHex(this.web3.utils.toWei(`${tx.value}`, 'ether')) : '0x00';
+      let  value = '0x00';
+      if (tx.value){
+        if (tx.value.startsWith('0x') || tx.value.startsWith('0X')) value = Web3.utils.toHex(tx.value.substring(2));
+        else value = Web3.utils.toHex(Web3.utils.toWei(`${tx.value}`, 'ether'));
+      }
+
       const gasLimit = Web3.utils.toHex(tx.gasLimit ? tx.gasLimit : await this.defaultGasLimit(tx.to, nonce, value, data));
 
       const txParams: any = {
+        from: tx.from,
         to: tx.to,
         chainId,
         nonce: Web3.utils.toHex(nonce),

@@ -13,6 +13,9 @@ program.addHelpText('after',
     $ ycj call
     $ ycj get
     $ ycj account
+    $ ycj transfer
+    $ ycj erc20
+    $ ycj erc721
 `);
 
 program.showHelpAfterError();
@@ -24,6 +27,8 @@ program.command('get', '用于通过eth_call方法, 调用合约的view方法');
 program.command('account', '用于批量创建账号');
 program.command('transfer', '用于批量转账链的本币, 如ETH, BNB等');
 program.command('sign', '用于给交易签名');
+program.command('erc20', '用于操作标准ERC20合约');
+program.command('erc721', '用于操作标准ERC721合约');
 
 
 program.parse(process.argv);

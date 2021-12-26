@@ -11,8 +11,11 @@ program.description("从签名私钥的账号中, 转账链的原生代币")
   .option('--amount <amount...>', '对应每个接收账号的接收的代币数量, 单位为 ether. 如 --amount "1.0" "0.8"')
   .option('--json <json>', '使用json文件列举转账信息, 如{"0xabc1": "1.0", "0xabc2": "0.8", ...}')
   .option('--gas-price <gasprice>', '设置gasPrice, 单位为 gwei')
+  .option('-s,--sign', "仅输出签名后交易, 但是不发送")
 
 program.parse(process.argv);
+
+const options = program.opts();
 
 interface TransferInfo {
   network: string;
@@ -23,7 +26,7 @@ interface TransferInfo {
 }
 
 
-function parseOptions(options: any) {
+function parseOptions() {
   const network = options.network;
   const recepients = options.to;
   const amounts = options.amount;
@@ -71,10 +74,15 @@ async function send(transInfo: TransferInfo): Promise<any> {
         to: transInfo.to[i],
         value: transInfo.amount[i],
         gasLimit: '21000',
+        gasPrice: transInfo.gasPrice
       };
       const signedTxHex = await txSender.sign(tx);
-      const receipt = await txSender.send(signedTxHex);
-      console.log(`SUCCESS => ${transInfo.to[i]} : ${transInfo.amount[i]}  ${receipt.transactionHash}}`);
+      if (options.sign) {
+        console.log(`\n${signedTxHex}`);
+      } else {
+        const receipt = await txSender.send(signedTxHex);
+        console.log(`SUCCESS => ${transInfo.to[i]} : ${transInfo.amount[i]}  ${receipt.transactionHash}}`);
+      }
     }
   } catch (e: any) {
     throw new Error(e.message);
@@ -84,7 +92,7 @@ async function send(transInfo: TransferInfo): Promise<any> {
 
 async function main() {
   try {
-    let opt = parseOptions(program.opts());
+    let opt = parseOptions();
     await send(opt);
   } catch (e: any) {
     console.log('错误: ' + e.message);

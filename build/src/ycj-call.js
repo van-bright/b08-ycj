@@ -16,8 +16,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const commander_1 = require("commander");
 const TxSender_1 = __importDefault(require("./TxSender"));
 commander_1.program
-    .requiredOption('--network <network>', '区块链网络的名称, 如"bsc", "matic"')
-    .option('--raw <raw>', '发送一个已经签名的交易')
+    .requiredOption('--network <network>', '区块链网络的名称, 如"bsc", "matic", 或者rpc地址')
+    .option('--raw <raw>', '发送一个已经签名的交易, 数据为一个hex字符串')
     .option('--contract <contract>', '被调用的合约地址')
     .option('--method <method>', '合约方法签名, 如 transfer')
     .option('--params <params>', '合约方法的参数类型列表, 如 --params ["address","uint256"]')
@@ -26,7 +26,8 @@ commander_1.program
     .option('--gas-limit <gasLimit>', '使用的gas上限, 如不提供, 将使用预估的gas limit')
     .option('--retry <retry>', '重试次数, 默认为1, 即不重试, 发出交易就可以. 0 表示无限次重试, 直到返回成功.')
     .option('--private-key <privateKey>', '签名的私钥')
-    .option('--value <value>', '调用时发送的value, 单位为ethers. 默认值为0');
+    .option('--value <value>', '调用时发送的value, 单位为ethers. 默认值为0')
+    .option('-s, --sign', '仅仅输出签名后的交易, 但是不发送');
 commander_1.program.parse(process.argv);
 const options = commander_1.program.opts();
 function getRetryTimes() {
@@ -43,23 +44,29 @@ function send() {
             let receipt;
             if (options.raw) {
                 receipt = yield txSender.send(options.raw);
+                return receipt.transactionHash;
             }
             else {
                 const tx = {
                     to: options.contract,
                     data: {
                         method: options.method,
-                        params: options.params,
-                        args: options.data
+                        params: JSON.parse(options.params),
+                        args: JSON.parse(options.data)
                     },
                     gasLimit: options.gasLimit,
                     gasPrice: options.gasPrice,
                     value: options.value
                 };
                 const signedTxHex = yield txSender.sign(tx);
-                receipt = yield txSender.send(signedTxHex);
+                if (options.sign) {
+                    return signedTxHex;
+                }
+                else {
+                    receipt = yield txSender.send(signedTxHex);
+                    return receipt.transactionHash;
+                }
             }
-            return receipt.transactionHash;
         }
         catch (e) {
             console.log('error: ', e);
