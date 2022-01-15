@@ -34,7 +34,7 @@ class TxSender {
         }
         if (mo.params) {
             const payload = this.web3.eth.abi.encodeParameters(mo.params, mo.args);
-            return `${func}${payload.substr(2)}`;
+            return `${func}${payload.substring(2)}`;
         }
         return func;
     }
@@ -87,9 +87,6 @@ class TxSender {
                         value = web3_1.default.utils.toHex(web3_1.default.utils.toWei(`${tx.value}`, 'ether'));
                 }
                 const gasLimit = web3_1.default.utils.toHex(tx.gasLimit ? tx.gasLimit : yield this.defaultGasLimit(tx.to, nonce, value, data));
-                console.log('value: ', value);
-                console.log('gasprice: ', gasPrice);
-                console.log('gaslimit: ', gasLimit);
                 const txParams = {
                     from: tx.from,
                     to: tx.to,
@@ -99,7 +96,7 @@ class TxSender {
                     gasLimit,
                     // 调用合约转账value这里留空
                     value,
-                    // data,
+                    data,
                 };
                 const etx = new EthereumTx(txParams);
                 // 引入私钥，并转换为16进制

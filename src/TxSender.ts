@@ -46,7 +46,7 @@ export default class TxSender {
     }
     if (mo.params) {
       const payload = this.web3.eth.abi.encodeParameters(mo.params, mo.args!);
-      return `${func}${payload.substr(2)}`
+      return `${func}${payload.substring(2)}`
     }
 
     return func;
