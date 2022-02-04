@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 
 import { program } from "commander";
+import Web3 from "web3";
+import {Hex} from "web3-utils";
+
 import TxSender, { TxOption } from "./TxSender";
 
 program
@@ -14,7 +17,11 @@ program
   .option('-s, --sign', '仅仅输出签名后的交易, 但是不发送')
 
 program.addHelpText('after', `
-  该命令支持ERC721规范的接口, 原型如下:
+  用法示例:
+  $ ycj erc721 --network matic --contract 0xd50d167dd35d256e19e2fb76d6b9bf9f4c571a3e --method balanceOf --data '["0x18d3c20a79fbceb89fa1dad8831dcf6ebbe27491"]'
+
+
+  该命令支持ERC721规范的接口, 各方法的原型如下:
 
   function balanceOf(address owner) external view returns (uint256 balance);
 
@@ -42,7 +49,7 @@ async function callViewMethod(tx: TxOption) {
   try {
     const txSender = new TxSender(options.network);
     const s = await txSender.query(tx);
-    console.log(s);
+    return s;
   } catch (e: any) {
     console.log('error: ', e);
     throw new Error(e);
@@ -75,7 +82,9 @@ async function balanceOf() {
     },
   };
 
-  await callViewMethod(tx);
+  let r: Hex = await callViewMethod(tx);
+  let v = Web3.utils.toBN(r).toString(10);
+  console.log(v);
 }
 
 async function ownerOf() {
@@ -88,7 +97,9 @@ async function ownerOf() {
     },
   };
 
-  await callViewMethod(tx);
+  let r = await callViewMethod(tx);
+  let v = TxSender.decode("address", r);
+  console.log(v);
 }
 
 
@@ -149,7 +160,10 @@ async function getApproved() {
     },
   };
 
-  await callViewMethod(tx);
+  let r = await callViewMethod(tx);
+  let v = Web3.utils.toBN(r).isZero();
+
+  console.log(!v);
 }
 
 async function setApprovalForAll() {
@@ -177,7 +191,9 @@ async function isApprovedForAll() {
     },
   };
 
-  await callViewMethod(tx);
+  let r = await callViewMethod(tx);
+  let v = Web3.utils.toBN(r).isZero();
+  console.log(!v);
 }
 
 const IERC721: { [k: string]: () => Promise<void> } = {

@@ -167,4 +167,9 @@ export default class TxSender {
       throw new Error(e.message);
     }
   }
+
+  static decode(type: string, hexStr: string) {
+    let web3 = new Web3("http://127.0.0.1");
+    return web3.eth.abi.decodeParameter(type, hexStr);
+  }
 }

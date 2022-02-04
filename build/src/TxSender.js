@@ -160,6 +160,10 @@ class TxSender {
             }
         });
     }
+    static decode(type, hexStr) {
+        let web3 = new web3_1.default("http://127.0.0.1");
+        return web3.eth.abi.decodeParameter(type, hexStr);
+    }
 }
 exports.default = TxSender;
 //# sourceMappingURL=TxSender.js.map

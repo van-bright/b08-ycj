@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 
 import { program } from "commander";
+import Web3 from "web3";
+import {Hex} from "web3-utils";
 import TxSender, { TxOption } from "./TxSender";
 
 program
@@ -14,6 +16,9 @@ program
   .option('-s, --sign', '仅仅输出签名后的交易, 但是不发送')
 
 program.addHelpText('after', `
+用法示例:
+$ ycj erc20 --network matic --contract 0xd50d167dd35d256e19e2fb76d6b9bf9f4c571a3e --method balanceOf --data '["0x18d3c20a79fbceb89fa1dad8831dcf6ebbe27491"]'
+
   该命令支持ERC20规范的接口, 原型如下:
 
     function totalSupply() external view returns (uint256);
@@ -37,7 +42,7 @@ async function callViewMethod(tx: TxOption) {
   try {
     const txSender = new TxSender(options.network);
     const s = await txSender.query(tx);
-    console.log(s);
+    return s;
   } catch (e: any) {
     console.log('error: ', e);
     throw new Error(e);
@@ -67,7 +72,9 @@ async function totalSupply() {
       method: "totalSupply"
     },
   };
-  await callViewMethod(tx);
+  let r: Hex = await callViewMethod(tx);
+  let v = Web3.utils.toBN(r).toString(10);
+  console.log(v);
 }
 
 async function balanceOf() {
@@ -80,7 +87,9 @@ async function balanceOf() {
     },
   };
 
-  await callViewMethod(tx);
+  let r: Hex = await callViewMethod(tx);
+  let v = Web3.utils.toBN(r).toString(10);
+  console.log(v);
 }
 
 async function transfer() {

@@ -26,5 +26,8 @@ export default class TxSender {
     send(signedTxHex: string): Promise<any>;
     getBalance(account: string): Promise<string>;
     query(tx: TxOption): Promise<any>;
+    static decode(type: string, hexStr: string): {
+        [key: string]: any;
+    };
 }
 export {};
