@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const commander_1 = require("commander");
+const web3_1 = __importDefault(require("web3"));
 const TxSender_1 = __importDefault(require("./TxSender"));
 commander_1.program
     .requiredOption('--network <network>', '区块链网络的名称, 如"bsc", "matic", 或者rpc地址')
@@ -25,6 +26,9 @@ commander_1.program
     .option('--private-key <privateKey>', '签名的私钥')
     .option('-s, --sign', '仅仅输出签名后的交易, 但是不发送');
 commander_1.program.addHelpText('after', `
+用法示例:
+$ ycj erc20 --network matic --contract 0xd50d167dd35d256e19e2fb76d6b9bf9f4c571a3e --method balanceOf --data '["0x18d3c20a79fbceb89fa1dad8831dcf6ebbe27491"]'
+
   该命令支持ERC20规范的接口, 原型如下:
 
     function totalSupply() external view returns (uint256);
@@ -46,7 +50,7 @@ function callViewMethod(tx) {
         try {
             const txSender = new TxSender_1.default(options.network);
             const s = yield txSender.query(tx);
-            console.log(s);
+            return s;
         }
         catch (e) {
             console.log('error: ', e);
@@ -81,7 +85,9 @@ function totalSupply() {
                 method: "totalSupply"
             },
         };
-        yield callViewMethod(tx);
+        let r = yield callViewMethod(tx);
+        let v = web3_1.default.utils.toBN(r).toString(10);
+        console.log(v);
     });
 }
 function balanceOf() {
@@ -94,7 +100,9 @@ function balanceOf() {
                 args: JSON.parse(options.data),
             },
         };
-        yield callViewMethod(tx);
+        let r = yield callViewMethod(tx);
+        let v = web3_1.default.utils.toBN(r).toString(10);
+        console.log(v);
     });
 }
 function transfer() {
