@@ -18,6 +18,7 @@ commander_1.program.addHelpText('after', `
     $ ycj erc20
     $ ycj erc721
     $ ycj collect
+    $ ycj abi
 `);
 commander_1.program.showHelpAfterError();
 // 配置command
@@ -32,6 +33,7 @@ commander_1.program.command('erc20', '用于操作标准ERC20合约');
 commander_1.program.command('erc721', '用于操作标准ERC721合约');
 commander_1.program.command('collect', '用于从多个账号中归集代币');
 commander_1.program.command('crypto', '密码学相关的方法');
+commander_1.program.command('abi', 'abi文件处理');
 commander_1.program.parse(process.argv);
 if (commander_1.program.args.length === 0) {
     commander_1.program.help();
