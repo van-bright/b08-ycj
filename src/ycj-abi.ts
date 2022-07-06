@@ -28,7 +28,7 @@ async function handle_event(e: any) {
 }
 
 async function handle_function(f: any) {
-    if (f.stateMutability === 'view') return;
+    // if (f.stateMutability === 'view') return;
 
     let fsig = f.name + '(';
     for (let i = 0; i < f.inputs.length; i++) {

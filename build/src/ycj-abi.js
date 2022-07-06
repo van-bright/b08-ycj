@@ -37,8 +37,7 @@ function handle_event(e) {
 }
 function handle_function(f) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (f.stateMutability === 'view')
-            return;
+        // if (f.stateMutability === 'view') return;
         let fsig = f.name + '(';
         for (let i = 0; i < f.inputs.length; i++) {
             fsig += f.inputs[i].type;
