@@ -13,6 +13,8 @@
   "author": "liangin.fan@gmail.com",
   "license": "ISC",
   "dependencies": {
+    "@ethereumjs/common": "^3.0.1",
+    "@ethereumjs/tx": "^4.0.1",
     "colors": "^1.4.0",
     "commander": "^8.3.0",
     "cross-fetch": "^3.1.4",

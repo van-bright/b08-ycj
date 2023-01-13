@@ -33,7 +33,7 @@ program.command('erc20', '用于操作标准ERC20合约');
 program.command('erc721', '用于操作标准ERC721合约');
 program.command('collect', '用于从多个账号中归集代币');
 program.command('crypto', '密码学相关的方法');
-program.command('abi', 'abi文件处理');
+program.command('selector', '通过abi文件, 生成function和event的selector');
 
 
 program.parse(process.argv);

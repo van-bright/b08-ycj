@@ -6,7 +6,7 @@ import Web3 from "web3";
 const colors = require('colors');
 
 program
-    .requiredOption('--file <file>', 'abi的json文件')
+    .requiredOption('--abi <file>', 'abi所在的json文件')
 
 program.parse(process.argv);
 
