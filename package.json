@@ -2,6 +2,7 @@
   "name": "b08-ycj",
   "version": "1.0.15",
   "description": "a cli to decode function call of ethereum ",
+  "homepage": "https://github.com/van-bright/b08-ycj",
   "main": "build/src/ycj.js",
   "bin": {
     "ycj": "build/src/ycj.js"
